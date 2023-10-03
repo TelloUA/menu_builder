@@ -1,0 +1,14 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Restaurant Choice{% endblock %}
+
+{% block body %}
+    <h2>Select restaurant!</h2>
+
+    {% for restaurant in restaurants %}
+        <h4>{{ restaurant }}</h4>
+        <p>
+            <a href="{{ path('restaurant', { id: restaurant.id }) }}">View</a>
+        </p>
+    {% endfor %}
+{% endblock %}

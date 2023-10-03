@@ -1,0 +1,22 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Restaurant - {{ restaurant }}{% endblock %}
+
+{% block body %}
+    <h2>{{ restaurant }} Restaurant</h2>
+
+    {% if sections|length > 0 %}
+        {% for section in sections %}
+
+            <h4>{{ section.name }}</h4>
+            {% if section.isactive %}
+                <p>Section is actual</p>
+            {% endif %}
+            {% if section.istemporary %}
+                <p>Section not available all day</p>
+            {% endif %}
+        {% endfor %}
+    {% else %}
+        <div>No section have been added yet for this restaurant.</div>
+    {% endif %}
+{% endblock %}
