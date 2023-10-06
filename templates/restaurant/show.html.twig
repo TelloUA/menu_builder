@@ -6,6 +6,8 @@
     <h2>{{ restaurant }} Restaurant</h2>
 
     {% if sections|length > 0 %}
+        <div>There are {{ sections|length }} sections.</div>
+
         {% for section in sections %}
 
             <h4>{{ section.name }}</h4>
@@ -16,6 +18,13 @@
                 <p>Section not available all day</p>
             {% endif %}
         {% endfor %}
+
+        {% if previous >= 0 %}
+            <a href="{{ path('restaurant', { id: restaurant.id, offset: previous }) }}">Previous</a>
+        {% endif %}
+        {% if next < sections|length %}
+            <a href="{{ path('restaurant', { id: restaurant.id, offset: next }) }}">Next</a>
+        {% endif %}
     {% else %}
         <div>No section have been added yet for this restaurant.</div>
     {% endif %}

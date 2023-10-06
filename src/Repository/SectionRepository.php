@@ -2,8 +2,10 @@
 
 namespace App\Repository;
 
+use App\Entity\Restaurant;
 use App\Entity\Section;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -16,10 +18,25 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class SectionRepository extends ServiceEntityRepository
 {
+    public const PAGINATOR_PER_PAGE = 2;
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Section::class);
     }
+
+    public function getSectionPaginator(Restaurant $restaurant, int $offset): Paginator {
+        $query = $this->createQueryBuilder('r')
+            ->andWhere('r.restaurant = :restaurant')
+            ->setParameter('restaurant', $restaurant)
+            ->orderBy('r.isActive', 'DESC')
+            ->setMaxResults(self::PAGINATOR_PER_PAGE)
+            ->setFirstResult($offset)
+            ->getQuery()
+        ;
+
+        return new Paginator($query);
+    }
+
 
 //    /**
 //     * @return Section[] Returns an array of Section objects

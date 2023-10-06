@@ -6,29 +6,33 @@ use App\Entity\Restaurant;
 use App\Repository\RestaurantRepository;
 use App\Repository\SectionRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Twig\Environment;
 
 class RestaurantController extends AbstractController
 {
     #[Route('/', name: 'homepage')]
-    public function index(Environment $twig, RestaurantRepository $restaurantRepository): Response
+    public function index(RestaurantRepository $restaurantRepository): Response
     {
-        return new Response($twig->render('restaurant/index.html.twig', [
+        return $this->render('restaurant/index.html.twig', [
             'restaurants' => $restaurantRepository->findAll(),
-        ]));
+        ]);
     }
 
     #[Route('/restaurant/{id}', name: 'restaurant')]
-    public function show(Environment $twig, Restaurant $restaurant, SectionRepository $sectionRepository): Response
+    public function show(Request $request, Restaurant $restaurant, SectionRepository $sectionRepository): Response
     {
-        return new Response($twig->render(
+        $offset = max(0, $request->query->getInt('offset', 0));
+        $paginator = $sectionRepository->getSectionPaginator($restaurant, $offset);
+        return $this->render(
             '/restaurant/show.html.twig',
             [
                 'restaurant' => $restaurant,
-                'sections' => $sectionRepository->findBy(['restaurant' => $restaurant]),
+                'sections' => $paginator,
+                'previous' => $offset - SectionRepository::PAGINATOR_PER_PAGE,
+                'next' => min(count($paginator), $offset + SectionRepository::PAGINATOR_PER_PAGE),
                 ]
-        ));
+        );
     }
 }
