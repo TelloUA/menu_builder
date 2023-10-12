@@ -14,6 +14,15 @@
         {% endblock %}
     </head>
     <body>
+    <header>
+        <h1><a href="{{ path('homepage') }}">Restaurants</a></h1>
+            <ul>
+                {% for restaurant in restaurants %}
+                    <li><a href="{{ path('restaurant', { slug: restaurant.slug }) }}">{{ restaurant }}</a></li>
+                {% endfor %}
+            </ul>
+        <hr />
+    </header>
         {% block body %}{% endblock %}
     </body>
 </html>

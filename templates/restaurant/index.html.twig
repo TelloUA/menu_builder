@@ -8,7 +8,7 @@
     {% for restaurant in restaurants %}
         <h4>{{ restaurant }}</h4>
         <p>
-            <a href="{{ path('restaurant', { id: restaurant.id }) }}">View</a>
+            <a href="{{ path('restaurant', { slug: restaurant.slug }) }}">View</a>
         </p>
     {% endfor %}
 {% endblock %}

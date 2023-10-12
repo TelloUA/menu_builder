@@ -6,26 +6,30 @@
     <h2>{{ restaurant }} Restaurant</h2>
 
     {% if sections|length > 0 %}
-        <div>There are {{ sections|length }} sections.</div>
+        <h4>There are {{ sections|length }} sections.</h4>
 
         {% for section in sections %}
-
-            <h4>{{ section.name }}</h4>
-            {% if section.isactive %}
-                <p>Section is actual</p>
-            {% endif %}
-            {% if section.istemporary %}
-                <p>Section not available all day</p>
-            {% endif %}
+            <p>{{ section.name }}</p>
         {% endfor %}
-
-        {% if previous >= 0 %}
-            <a href="{{ path('restaurant', { id: restaurant.id, offset: previous }) }}">Previous</a>
-        {% endif %}
-        {% if next < sections|length %}
-            <a href="{{ path('restaurant', { id: restaurant.id, offset: next }) }}">Next</a>
-        {% endif %}
     {% else %}
         <div>No section have been added yet for this restaurant.</div>
     {% endif %}
+        <hr>
+
+    {% if reviews|length > 0 %}
+        <h4>Restaurant have {{ reviews|length }} comments.</h4>
+        {% for review in reviews %}
+            <p>Review by {{ review.author }}, with rating - {{ review.rating }}, created at {{ review.createdAt|date('H:i Y-m-d') }}</p>
+        {% endfor %}
+
+        {% if previous >= 0 %}
+            <a href="{{ path('restaurant', { slug: restaurant.slug, offset: previous }) }}">Previous</a>
+        {% endif %}
+        {% if next < reviews|length %}
+            <a href="{{ path('restaurant', { slug: restaurant.slug, offset: next }) }}">Next</a>
+        {% endif %}
+    {% else %}
+        <div>No comments have been added yet for this restaurant.</div>
+    {% endif %}
+
 {% endblock %}

@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Restaurant;
 use App\Repository\RestaurantRepository;
+use App\Repository\ReviewRepository;
 use App\Repository\SectionRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -20,18 +21,24 @@ class RestaurantController extends AbstractController
         ]);
     }
 
-    #[Route('/restaurant/{id}', name: 'restaurant')]
-    public function show(Request $request, Restaurant $restaurant, SectionRepository $sectionRepository): Response
+    #[Route('/restaurant/{slug}', name: 'restaurant')]
+    public function show(
+        Request $request,
+        Restaurant $restaurant,
+        SectionRepository $sectionRepository,
+        ReviewRepository $reviewRepository
+    ): Response
     {
         $offset = max(0, $request->query->getInt('offset', 0));
-        $paginator = $sectionRepository->getSectionPaginator($restaurant, $offset);
+        $paginator = $reviewRepository->getReviewPaginator($restaurant, $offset);
         return $this->render(
             '/restaurant/show.html.twig',
             [
                 'restaurant' => $restaurant,
-                'sections' => $paginator,
-                'previous' => $offset - SectionRepository::PAGINATOR_PER_PAGE,
-                'next' => min(count($paginator), $offset + SectionRepository::PAGINATOR_PER_PAGE),
+                'sections' => $sectionRepository->findBy(['restaurant' => $restaurant, 'isActive' => true]),
+                'reviews' => $paginator,
+                'previous' => $offset - ReviewRepository::PAGINATOR_PER_PAGE,
+                'next' => min(count($paginator), $offset + ReviewRepository::PAGINATOR_PER_PAGE),
                 ]
         );
     }

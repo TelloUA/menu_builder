@@ -3,6 +3,7 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Restaurant;
+use App\Entity\Review;
 use App\Entity\Section;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
@@ -50,6 +51,7 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::linktoRoute('Back to the website', 'fas fa-home', 'homepage');;
         // yield MenuItem::linkToCrud('The Label', 'fas fa-list', EntityClass::class);
         yield MenuItem::linkToCrud('Restaurant', 'fas fa-map-marker-alt', Restaurant::class);
-        yield MenuItem::linkToCrud('Section', 'fas fa-comments', Section::class);
+        yield MenuItem::linkToCrud('Section', 'fas fa-folder', Section::class);
+        yield MenuItem::linkToCrud('Review', 'fas fa-comments', Review::class);
     }
 }
