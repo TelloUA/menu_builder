@@ -34,8 +34,6 @@ class ReviewCrudController extends AbstractCrudController
         ]);
         if (Crud::PAGE_EDIT === $pageName) {
             yield $createdAt->setFormTypeOption('disabled', true);
-        } else {
-            yield $createdAt;
         }
     }
 }

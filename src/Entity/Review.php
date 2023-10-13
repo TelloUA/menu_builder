@@ -4,8 +4,10 @@ namespace App\Entity;
 
 use App\Repository\ReviewRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ReviewRepository::class)]
+#[ORM\HasLifecycleCallbacks]
 class Review
 {
     #[ORM\Id]
@@ -14,18 +16,23 @@ class Review
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank]
     private ?string $author = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank]
     private ?string $text = null;
 
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank]
+    #[Assert\Email]
     private ?string $email = null;
 
     #[ORM\Column]
+    #[Assert\NotBlank]
     private ?int $rating = null;
 
     #[ORM\ManyToOne(inversedBy: 'reviews')]
@@ -107,5 +114,11 @@ class Review
         $this->restaurant = $restaurant;
 
         return $this;
+    }
+
+    #[ORM\PrePersist]
+    public function setCreatedAtValue(): void
+    {
+        $this->createdAt = new \DateTimeImmutable();
     }
 }
