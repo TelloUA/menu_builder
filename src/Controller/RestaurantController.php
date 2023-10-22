@@ -8,6 +8,7 @@ use App\Form\ReviewType;
 use App\Repository\RestaurantRepository;
 use App\Repository\ReviewRepository;
 use App\Repository\SectionRepository;
+use App\SpamChecker;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -35,9 +36,11 @@ class RestaurantController extends AbstractController
         Request $request,
         Restaurant $restaurant,
         SectionRepository $sectionRepository,
-        ReviewRepository $reviewRepository
+        ReviewRepository $reviewRepository,
+        SpamChecker $spamChecker,
     ): Response
     {
+        $info = 'default';
         $review = new Review();
         $form = $this->createForm(ReviewType::class, $review);
         $form->handleRequest($request);
@@ -45,6 +48,17 @@ class RestaurantController extends AbstractController
             $review->setRestaurant($restaurant);
 
             $this->entityManager->persist($review);
+
+            $context = [
+                'user_ip' => $request->getClientIp(),
+                'user_agent' => $request->headers->get('user-agent'),
+                'referrer' => $request->headers->get('referer'),
+                'permalink' => $request->getUri(),
+            ];
+            if (2 === $spamChecker->getSpamScore($review, $context)) {
+                throw new \RuntimeException('Blatant spam, go away!');
+            }
+
             $this->entityManager->flush();
 
             return $this->redirectToRoute('restaurant', ['slug' => $restaurant->getSlug()]);
@@ -55,6 +69,7 @@ class RestaurantController extends AbstractController
         return $this->render(
             '/restaurant/show.html.twig',
             [
+                'info' => $info,
                 'restaurant' => $restaurant,
                 'sections' => $sectionRepository->findBy(['restaurant' => $restaurant, 'isActive' => true]),
                 'reviews' => $paginator,
