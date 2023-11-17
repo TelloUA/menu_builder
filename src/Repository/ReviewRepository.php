@@ -18,7 +18,7 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class ReviewRepository extends ServiceEntityRepository
 {
-    public const PAGINATOR_PER_PAGE = 2;
+    public const PAGINATOR_PER_PAGE = 5;
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Review::class);
@@ -27,7 +27,9 @@ class ReviewRepository extends ServiceEntityRepository
     public function getReviewPaginator(Restaurant $restaurant, int $offset): Paginator {
         $query = $this->createQueryBuilder('r')
             ->andWhere('r.restaurant = :restaurant')
+            ->andWhere('r.state = :state')
             ->setParameter('restaurant', $restaurant)
+            ->setParameter('state', 'published')
             ->orderBy('r.createdAt', 'DESC')
             ->setMaxResults(self::PAGINATOR_PER_PAGE)
             ->setFirstResult($offset)

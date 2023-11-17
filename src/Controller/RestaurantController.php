@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Restaurant;
 use App\Entity\Review;
 use App\Form\ReviewType;
+use App\Message\ReviewMessage;
 use App\Repository\RestaurantRepository;
 use App\Repository\ReviewRepository;
 use App\Repository\SectionRepository;
@@ -13,6 +14,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
 class RestaurantController extends AbstractController
@@ -20,6 +22,7 @@ class RestaurantController extends AbstractController
 
     public function __construct(
         private EntityManagerInterface $entityManager,
+        private MessageBusInterface $bus,
     ) {
     }
 
@@ -37,7 +40,6 @@ class RestaurantController extends AbstractController
         Restaurant $restaurant,
         SectionRepository $sectionRepository,
         ReviewRepository $reviewRepository,
-        SpamChecker $spamChecker,
     ): Response
     {
         $info = 'default';
@@ -48,6 +50,7 @@ class RestaurantController extends AbstractController
             $review->setRestaurant($restaurant);
 
             $this->entityManager->persist($review);
+            $this->entityManager->flush();
 
             $context = [
                 'user_ip' => $request->getClientIp(),
@@ -55,11 +58,7 @@ class RestaurantController extends AbstractController
                 'referrer' => $request->headers->get('referer'),
                 'permalink' => $request->getUri(),
             ];
-            if (2 === $spamChecker->getSpamScore($review, $context)) {
-                throw new \RuntimeException('Blatant spam, go away!');
-            }
-
-            $this->entityManager->flush();
+            $this->bus->dispatch(new ReviewMessage($review->getId(), $context));
 
             return $this->redirectToRoute('restaurant', ['slug' => $restaurant->getSlug()]);
         }

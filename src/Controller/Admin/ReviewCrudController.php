@@ -27,6 +27,7 @@ class ReviewCrudController extends AbstractCrudController
         yield TextareaField::new('text')
             ->hideOnIndex()
         ;
+        yield TextField::new('state');
         yield NumberField::new('rating');
         $createdAt = DateTimeField::new('createdAt')->setFormTypeOptions([
             'years' => range(date('Y'), date('Y') + 5),
